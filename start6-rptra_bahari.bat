@@ -1,0 +1,1 @@
+java -jar dist\JavaFXApplication2.jar "http://114.110.17.6:8917/image.jpg?type=motion&camera=1" "RPTRA Bahari, Terogong"
