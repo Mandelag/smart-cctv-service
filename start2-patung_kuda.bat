@@ -1,1 +1,1 @@
-java -jar dist\smart-cctv.jar "http://114.110.17.6:8921/JpegStream.cgi?username=bit&password=guest&channel=1" "Patung Kuda, Jl. Medan Merdeka Barat"
+java -cp target/smart-cctv-service-1.0-SNAPSHOT.jar com.mandelag.smartcctv.services.MainCCTVService localhost 9096 "http://114.110.17.6:8921/JpegStream.cgi?username=bit&password=guest&channel=1" .\src\main\java\res\cars.xml
