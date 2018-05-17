@@ -117,7 +117,9 @@ public class CCTVServlet extends HttpServlet {
         }
         while (true) {
             try {
-                this.wait(0);
+                synchronized(this){
+                    this.wait(0);
+                }
                 try {
                     byte[] image = cctvService.getDetectionImage();
                     response.getOutputStream().write(contentType);
@@ -131,7 +133,7 @@ public class CCTVServlet extends HttpServlet {
                     response.getOutputStream().flush();
                 } catch (IOException e) {
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException|IllegalMonitorStateException e) {
 
             }
         }

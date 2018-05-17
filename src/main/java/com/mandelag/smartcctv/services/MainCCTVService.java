@@ -93,8 +93,9 @@ public class MainCCTVService {
                     bos.write(preImgByte);
                     bos.write(b);
                     detectionImage = processImage(bos.toByteArray());
-                    //byte[] processedImage = bos.toByteArray();
-                    cs.notify();
+                    synchronized(cs) {
+                        cs.notify();
+                    }
                 } catch (IOException e) {
                 }
             };
