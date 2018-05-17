@@ -44,6 +44,7 @@ public class MainCCTVService {
 
     private static CascadeClassifier carsClassifier;    
     private int vehicleCount = 0;
+    private byte[] detectionImage;
     
     public static void main(String[] args) throws Exception {
         if(args.length < 4 ) {
@@ -91,9 +92,9 @@ public class MainCCTVService {
                 try (ByteArrayOutputStream bos = new ByteArrayOutputStream(b.length + 3)) {
                     bos.write(preImgByte);
                     bos.write(b);
-                    byte[] processedImage = processImage(bos.toByteArray());
+                    detectionImage = processImage(bos.toByteArray());
                     //byte[] processedImage = bos.toByteArray();
-                    cs.receiveImage(processedImage);
+                    cs.notify();
                 } catch (IOException e) {
                 }
             };
@@ -125,7 +126,9 @@ public class MainCCTVService {
     }
     
     private byte[] processImage(byte[] imageBytes) {
-        Mat frame = Imgcodecs.imdecode(new MatOfByte(imageBytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED
+        Mat frame2 = Imgcodecs.imdecode(new MatOfByte(imageBytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED
+        Mat frame = new Mat();
+        Imgproc.resize(frame2, frame, new Size(600, 300));
         //Mat rot = Imgproc.getRotationMatrix2D(new Point(frame.width()/2, frame.height()/2), 21, 1);
         //Imgproc.warpAffine(frame, frame, rot, new Size(frame.width(), frame.height()));
         MatOfRect matOfRect = new MatOfRect();
@@ -149,5 +152,9 @@ public class MainCCTVService {
     
     public int getVehicleCount(){
         return this.vehicleCount;
+    }
+    
+    public byte[] getDetectionImage() {
+        return this.detectionImage;
     }
 }

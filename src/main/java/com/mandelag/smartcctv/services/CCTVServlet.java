@@ -118,8 +118,9 @@ public class CCTVServlet extends HttpServlet {
         }
         while (true) {
             try {
-                Thread.sleep(0);
+                this.wait(0);
                 try {
+                    byte[] image = cctvService.getDetectionImage();
                     response.getOutputStream().write(contentType);
                     response.getOutputStream().write(contentLength);
                     response.getOutputStream().write((image.length + "").getBytes(Charset.forName("UTF-8")));
@@ -136,8 +137,6 @@ public class CCTVServlet extends HttpServlet {
             }
         }
     }
-    private byte[] image;
-    private int carCount;
 
     int[] preImg = new int[]{0xff, 0xd8, 0xff};
     byte[] preImgByte = new byte[preImg.length];
@@ -146,15 +145,6 @@ public class CCTVServlet extends HttpServlet {
         for (int i = 0; i < preImg.length; i++) {
             preImgByte[i] = (byte) preImg[i];
         }
-    }
-
-    public void receiveImage(byte[] image) {
-        this.image = image;
-        Thread.currentThread().interrupt();
-    }
-
-    public void receiveCarCount(int carCount) {
-        this.carCount = carCount;
     }
 
     @Override
