@@ -1,0 +1,1 @@
+java -cp target/smart-cctv-service-1.0-SNAPSHOT.jar com.mandelag.smartcctv.services.MainCCTVService localhost 9100 "http://114.110.17.6:8917/image.jpg?type=motion&camera=1" .\src\main\java\res\cars.xml
