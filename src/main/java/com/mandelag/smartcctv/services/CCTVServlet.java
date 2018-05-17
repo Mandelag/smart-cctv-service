@@ -12,8 +12,6 @@ package com.mandelag.smartcctv.services;
  */
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
