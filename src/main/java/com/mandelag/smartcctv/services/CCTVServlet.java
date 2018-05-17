@@ -98,7 +98,8 @@ public class CCTVServlet extends HttpServlet {
     }// </editor-fold>
 
     private void handleCount(HttpServletResponse response) throws IOException {
-        response.getWriter().println(cctvService.getVehicleCount());
+        String json = String.format("{\"totalVehicles\": %d, \"cars\":0, \"bus\":0, \"motorcycles\":0}", cctvService.getVehicleCount());
+        response.getWriter().println(json);
     }
 
     private void handleImage(HttpServletResponse response) {
