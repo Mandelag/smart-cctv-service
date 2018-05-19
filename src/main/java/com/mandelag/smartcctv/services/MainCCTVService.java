@@ -165,11 +165,11 @@ public class MainCCTVService {
         }
     }
     
-    public boolean subscribe(Thread t) {
+    synchronized public boolean subscribe(Thread t) {
         return subscriber.add(t);
     }
     
-    public boolean unsubscribe(Thread t) {
+    synchronized public boolean unsubscribe(Thread t) {
         return subscriber.remove(t);
     }
 }
