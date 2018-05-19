@@ -17,6 +17,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -42,7 +43,8 @@ import org.opencv.objdetect.CascadeClassifier;
  */
 public class MainCCTVService {
 
-    private static CascadeClassifier carsClassifier;    
+    private static CascadeClassifier carsClassifier; 
+    private ArrayList<Thread> subscriber = new ArrayList<>(10);
     private int vehicleCount = 0;
     private byte[] detectionImage;
     
@@ -157,5 +159,13 @@ public class MainCCTVService {
     
     public byte[] getDetectionImage() {
         return this.detectionImage;
+    }
+    
+    public void subscribe(Thread t) {
+        
+    }
+    
+    public void unsubscribe(Thread t) {
+        
     }
 }

@@ -115,12 +115,11 @@ public class CCTVServlet extends HttpServlet {
             response.getOutputStream().write(boundaryByte);
         } catch (IOException e) {
         }
-        while (true) {
-            try {
-                synchronized(this){
-                    this.wait(0);
-                }
+        cctvService.subscribe(Thread.currentThread());
+        try {
+            while (true) {
                 try {
+                    Thread.sleep(0);
                     byte[] image = cctvService.getDetectionImage();
                     response.getOutputStream().write(contentType);
                     response.getOutputStream().write(contentLength);
@@ -131,11 +130,14 @@ public class CCTVServlet extends HttpServlet {
                     response.getOutputStream().write(image);
                     response.getOutputStream().write(boundaryByte);
                     response.getOutputStream().flush();
-                } catch (IOException e) {
-                }
-            } catch (InterruptedException|IllegalMonitorStateException e) {
+                } catch (InterruptedException | IllegalMonitorStateException e) {
 
+                }
             }
+        } catch (IOException e) {
+
+        } finally {
+            cctvService.unsubscribe(Thread.currentThread());
         }
     }
 

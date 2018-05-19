@@ -1,1 +1,0 @@
-java -cp target/smart-cctv-service-1.0-SNAPSHOT.jar com.mandelag.smartcctv.services.MainCCTVService localhost 9097 "http://114.110.17.6:8920/JpegStream.cgi?username=bit&password=guest&channel=1" .\src\main\java\res\cars.xml
