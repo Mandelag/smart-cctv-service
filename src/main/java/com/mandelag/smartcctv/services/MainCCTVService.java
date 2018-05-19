@@ -159,17 +159,17 @@ public class MainCCTVService {
         return this.detectionImage;
     }
     
-    private void notifySubscriber() {
+    synchronized private void notifySubscriber() {
         for (Thread subs : subscriber) {
             subs.interrupt();
         }
     }
     
-    public boolean subscribe(Thread t) {
+    synchronized public boolean subscribe(Thread t) {
         return subscriber.add(t);
     }
     
-    public boolean unsubscribe(Thread t) {
+    synchronized public boolean unsubscribe(Thread t) {
         return subscriber.remove(t);
     }
 }
