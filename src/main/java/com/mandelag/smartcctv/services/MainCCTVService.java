@@ -95,8 +95,10 @@ public class MainCCTVService {
                     bos.write(preImgByte);
                     bos.write(b);
                     detectionImage = processImage(bos.toByteArray());
-                    notifySubscriber();
-                } catch (IOException e) {
+                    synchronized(cs) {
+                        cs.notify();
+                    }
+                } catch (IOException|IllegalMonitorStateException e) {
                 }
             };
             String separator = huc.getHeaderField("content-type").split("boundary=")[1];
