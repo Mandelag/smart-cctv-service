@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import javax.servlet.Servlet;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -43,18 +44,18 @@ import org.opencv.objdetect.CascadeClassifier;
  */
 public class MainCCTVService {
 
-    private static CascadeClassifier carsClassifier; 
-    private ArrayList<Thread> subscriber = new ArrayList<>(10);
+    private static CascadeClassifier carsClassifier;
+    private ArrayList<Servlet> subscriber = new ArrayList<>(10);
     private int vehicleCount = 0;
     private byte[] detectionImage;
-    
+
     public static void main(String[] args) throws Exception {
-        if(args.length < 4 ) {
+        if (args.length < 4) {
             System.out.println("    Usage: java -jar com.mandelag.smartcctv.MainCCTVService <ip> <port> <cctv_address> <haar_classifier>");
             return;
         }
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        
+
         String serverAddress = args[0];
         String port = args[1];
         String cctv = args[2];
@@ -62,10 +63,10 @@ public class MainCCTVService {
         MainCCTVService cctvService = new MainCCTVService();
         cctvService.start(serverAddress, port, cctv, classifier);
     }
-    
-    public void start(String serverAddress, String port, String  cctv, String classifier) throws Exception{
+
+    public void start(String serverAddress, String port, String cctv, String classifier) throws Exception {
         carsClassifier = new CascadeClassifier();
-        
+
         carsClassifier.load(classifier);
         System.out.println(classifier);
 
@@ -95,10 +96,10 @@ public class MainCCTVService {
                     bos.write(preImgByte);
                     bos.write(b);
                     detectionImage = processImage(bos.toByteArray());
-                    synchronized(cs) {
-                        cs.notify();
+                    synchronized (this) {
+                        this.notifyAll();
                     }
-                } catch (IOException|IllegalMonitorStateException e) {
+                } catch (IOException | IllegalMonitorStateException e) {
                 }
             };
             String separator = huc.getHeaderField("content-type").split("boundary=")[1];
@@ -127,7 +128,7 @@ public class MainCCTVService {
             System.err.println(e);
         }
     }
-    
+
     private byte[] processImage(byte[] imageBytes) {
         Mat frame2 = Imgcodecs.imdecode(new MatOfByte(imageBytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED
         Mat frame = new Mat();
@@ -152,26 +153,13 @@ public class MainCCTVService {
         frame.release();
         return matOfByte.toArray();
     }
-    
-    public int getVehicleCount(){
+
+    public int getVehicleCount() {
         return this.vehicleCount;
     }
-    
+
     public byte[] getDetectionImage() {
         return this.detectionImage;
     }
-    
-    synchronized private void notifySubscriber() {
-        for (Thread subs : subscriber) {
-            subs.interrupt();
-        }
-    }
-    
-    synchronized public boolean subscribe(Thread t) {
-        return subscriber.add(t);
-    }
-    
-    synchronized public boolean unsubscribe(Thread t) {
-        return subscriber.remove(t);
-    }
+
 }

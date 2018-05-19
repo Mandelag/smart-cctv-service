@@ -12,6 +12,8 @@ package com.mandelag.smartcctv.services;
  */
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -115,26 +117,26 @@ public class CCTVServlet extends HttpServlet {
             response.getOutputStream().write(boundaryByte);
         } catch (IOException e) {
         }
-        cctvService.subscribe(Thread.currentThread());
         try {
             while (true) {
+
                 try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    byte[] image = cctvService.getDetectionImage();
-                    response.getOutputStream().write(contentType);
-                    response.getOutputStream().write(contentLength);
-                    response.getOutputStream().write((image.length + "").getBytes(Charset.forName("UTF-8")));
-                    response.getOutputStream().write("\r\n\r\n".getBytes(Charset.forName("UTF-8")));
-                    response.getOutputStream().write(image);
-                    response.getOutputStream().write(boundaryByte);
-                    response.getOutputStream().flush();
+                    synchronized (cctvService) {
+                        cctvService.wait();
+                    }
+                } catch (InterruptedException ex) {
                 }
+                byte[] image = cctvService.getDetectionImage();
+                response.getOutputStream().write(contentType);
+                response.getOutputStream().write(contentLength);
+                response.getOutputStream().write((image.length + "").getBytes(Charset.forName("UTF-8")));
+                response.getOutputStream().write("\r\n\r\n".getBytes(Charset.forName("UTF-8")));
+                response.getOutputStream().write(image);
+                response.getOutputStream().write(boundaryByte);
+                response.getOutputStream().flush();
             }
         } catch (IOException e) {
 
-        } finally {
-            cctvService.unsubscribe(Thread.currentThread());
         }
     }
 
