@@ -96,7 +96,7 @@ public class MainCCTVService {
                     synchronized(cs) {
                         cs.notify();
                     }
-                } catch (IOException e) {
+                } catch (IOException|IllegalMonitorStateException e) {
                 }
             };
             String separator = huc.getHeaderField("content-type").split("boundary=")[1];
