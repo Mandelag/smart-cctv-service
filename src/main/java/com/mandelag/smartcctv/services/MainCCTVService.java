@@ -95,9 +95,7 @@ public class MainCCTVService {
                     bos.write(preImgByte);
                     bos.write(b);
                     detectionImage = processImage(bos.toByteArray());
-                    synchronized(cs) {
-                        cs.notify();
-                    }
+                    notifySubscriber();
                 } catch (IOException e) {
                 }
             };
@@ -161,11 +159,17 @@ public class MainCCTVService {
         return this.detectionImage;
     }
     
-    public void subscribe(Thread t) {
-        
+    private void notifySubscriber() {
+        for (Thread subs : subscriber) {
+            subs.interrupt();
+        }
     }
     
-    public void unsubscribe(Thread t) {
-        
+    public boolean subscribe(Thread t) {
+        return subscriber.add(t);
+    }
+    
+    public boolean unsubscribe(Thread t) {
+        return subscriber.remove(t);
     }
 }

@@ -120,18 +120,15 @@ public class CCTVServlet extends HttpServlet {
             while (true) {
                 try {
                     Thread.sleep(0);
+                } catch (InterruptedException e) {
                     byte[] image = cctvService.getDetectionImage();
                     response.getOutputStream().write(contentType);
                     response.getOutputStream().write(contentLength);
                     response.getOutputStream().write((image.length + "").getBytes(Charset.forName("UTF-8")));
-                    //write header...
                     response.getOutputStream().write("\r\n\r\n".getBytes(Charset.forName("UTF-8")));
-                    //response.getOutputStream().write(preImgByte);
                     response.getOutputStream().write(image);
                     response.getOutputStream().write(boundaryByte);
                     response.getOutputStream().flush();
-                } catch (InterruptedException | IllegalMonitorStateException e) {
-
                 }
             }
         } catch (IOException e) {
