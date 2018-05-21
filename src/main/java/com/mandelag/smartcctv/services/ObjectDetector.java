@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.tensorflow.Graph;
 import org.tensorflow.Operation;
+import org.tensorflow.Session;
 
 /**
  *
@@ -45,10 +46,18 @@ public class ObjectDetector {
             //}
             objectDetectionGraph.importGraphDef(baos.toByteArray());
             Iterator<Operation> opsIterator = objectDetectionGraph.operations();
-            while(opsIterator.hasNext()){
+            while (opsIterator.hasNext()) {
                 Operation ops = opsIterator.next();
-                System.out.println(ops.name());
+                try {
+                    int length = ops.numOutputs();
+                    for (int i=0; i<length; i++) {
+                        System.out.println(ops.output(i));
+                    }
+                } catch (IllegalArgumentException e) {
+
+                }
             }
+
         } catch (IOException ex) {
             Logger.getLogger(ObjectDetector.class.getName()).log(Level.SEVERE, null, ex);
         }
