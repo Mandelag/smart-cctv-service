@@ -11,33 +11,47 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.tensorflow.Graph;
+import org.tensorflow.Operation;
 
 /**
  *
  * @author Keenan
  */
 public class ObjectDetector {
+
     public static void main(String[] args) {
         Graph objectDetectionGraph = new Graph();
-        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream("src\\java\\res\\ssd_mobilenet_v1_coco_2017_11_17\\frozen_inference_graph.pb"))){
+        Path currentRelativePath = Paths.get("");
+        String s = currentRelativePath.toAbsolutePath().toString();
+        System.out.println("Current relative path is: " + s);
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("src\\main\\java\\res\\ssd_mobilenet_v1_coco_2017_11_17\\frozen_inference_graph.pb"))) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             BufferedOutputStream bos = new BufferedOutputStream(baos);
             byte[] reader = new byte[1024];
             int lengthRead = 0;
-            while( (lengthRead = bis.read(reader) ) != -1) {
+            while ((lengthRead = bis.read(reader)) != -1) {
                 bos.write(Arrays.copyOfRange(reader, 0, lengthRead));
             }
-            try(FileOutputStream fos = new FileOutputStream("test.pb")) {
-                fos.write(baos.toByteArray());
+            bos.flush();
+            //try (FileOutputStream fos = new FileOutputStream("test.pb")) {
+            //    fos.write(baos.toByteArray());
+            //}
+            objectDetectionGraph.importGraphDef(baos.toByteArray());
+            Iterator<Operation> opsIterator = objectDetectionGraph.operations();
+            while(opsIterator.hasNext()){
+                Operation ops = opsIterator.next();
+                System.out.println(ops.name());
             }
-            //objectDetectionGraph.importGraphDef(graphDef);
         } catch (IOException ex) {
             Logger.getLogger(ObjectDetector.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 }
