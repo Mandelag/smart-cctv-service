@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+package object_detection;
 
 import static object_detection.protos.StringIntLabelMapOuterClass.StringIntLabelMap;
 import static object_detection.protos.StringIntLabelMapOuterClass.StringIntLabelMapItem;
@@ -118,7 +119,7 @@ public class DetectObjects {
     System.out.println("-----------------------------------------------");
   }
 
-  private static String[] loadLabels(String filename) throws Exception {
+  public static String[] loadLabels(String filename) throws Exception {
     String text = new String(Files.readAllBytes(Paths.get(filename)), StandardCharsets.UTF_8);
     StringIntLabelMap.Builder builder = StringIntLabelMap.newBuilder();
     TextFormat.merge(text, builder);
@@ -136,7 +137,7 @@ public class DetectObjects {
     return ret;
   }
 
-  private static void bgr2rgb(byte[] data) {
+  public static void bgr2rgb(byte[] data) {
     for (int i = 0; i < data.length; i += 3) {
       byte tmp = data[i];
       data[i] = data[i + 2];
@@ -144,7 +145,7 @@ public class DetectObjects {
     }
   }
 
-  private static Tensor<UInt8> makeImageTensor(String filename) throws IOException {
+  public static Tensor<UInt8> makeImageTensor(String filename) throws IOException {
     BufferedImage img = ImageIO.read(new File(filename));
     if (img.getType() != BufferedImage.TYPE_3BYTE_BGR) {
       throw new IOException(

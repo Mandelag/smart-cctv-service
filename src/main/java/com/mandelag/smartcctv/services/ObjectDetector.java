@@ -67,7 +67,7 @@ public class ObjectDetector {
         String s = currentRelativePath.toAbsolutePath().toString();
         System.out.println("Current relative path is: " + s);
 
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("src\\main\\java\\res\\ssd_mobilenet_v1_coco_2017_11_17\\frozen_inference_graph.pb"))) {
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("src\\main\\models\\ssd_mobilenet_v1_coco_2017_11_17\\frozen_inference_graph.pb"))) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             BufferedOutputStream bos = new BufferedOutputStream(baos);
             byte[] reader = new byte[1024];

@@ -5,6 +5,7 @@
  */
 package com.mandelag.smartcctv.services;
 
+import object_detection.DetectObjects;
 import com.mandelag.extractor.InputStreamExtractor;
 import com.mandelag.extractor.InputStreamMarker;
 import java.io.BufferedInputStream;
@@ -18,8 +19,10 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import javax.servlet.Servlet;
+import static object_detection.DetectObjects.makeImageTensor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -37,6 +40,9 @@ import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
+import org.tensorflow.SavedModelBundle;
+import org.tensorflow.Tensor;
+import org.tensorflow.types.UInt8;
 
 /**
  *
@@ -48,6 +54,8 @@ public class MainCCTVService {
     private ArrayList<Servlet> subscriber = new ArrayList<>(10);
     private int vehicleCount = 0;
     private byte[] detectionImage;
+
+    private String[] labels;
 
     public static void main(String[] args) throws Exception {
         if (args.length < 4) {
@@ -64,9 +72,55 @@ public class MainCCTVService {
         cctvService.start(serverAddress, port, cctv, classifier);
     }
 
+    private void testObjectDetect() throws IOException {
+        String modelPath = "src\\main\\models\\ssd_inception_v2_coco_2017_11_17\\frozen_inference_graph.pb";
+        try (SavedModelBundle model = SavedModelBundle.load(modelPath, "serve")) {
+            final String filename = "src\\main\\java\\res\\images\\wisma_kosgoro.jpg";
+            List<Tensor<?>> outputs = null;
+            try (Tensor<UInt8> input = makeImageTensor(filename)) {
+                outputs
+                        = model
+                                .session()
+                                .runner()
+                                .feed("image_tensor", input)
+                                .fetch("detection_scores")
+                                .fetch("detection_classes")
+                                .fetch("detection_boxes")
+                                .run();
+            }
+            try (Tensor<Float> scoresT = outputs.get(0).expect(Float.class);
+                    Tensor<Float> classesT = outputs.get(1).expect(Float.class);
+                    Tensor<Float> boxesT = outputs.get(2).expect(Float.class)) {
+                // All these tensors have:
+                // - 1 as the first dimension
+                // - maxObjects as the second dimension
+                // While boxesT will have 4 as the third dimension (2 sets of (x, y) coordinates).
+                // This can be verified by looking at scoresT.shape() etc.
+                int maxObjects = (int) scoresT.shape()[1];
+                float[] scores = scoresT.copyTo(new float[1][maxObjects])[0];
+                float[] classes = classesT.copyTo(new float[1][maxObjects])[0];
+                float[][] boxes = boxesT.copyTo(new float[1][maxObjects][4])[0];
+                // Print all objects whose score is at least 0.5.
+                System.out.printf("* %s\n", filename);
+                boolean foundSomething = false;
+                for (int i = 0; i < scores.length; ++i) {
+                    if (scores[i] < 0.5) {
+                        continue;
+                    }
+                    foundSomething = true;
+                    System.out.printf("\tFound %-20s (score: %.4f)\n", labels[(int) classes[i]], scores[i]);
+                }
+                if (!foundSomething) {
+                    System.out.println("No objects detected with a high enough score.");
+                }
+            }
+        }
+    }
+
     public void start(String serverAddress, String port, String cctv, String classifier) throws Exception {
         carsClassifier = new CascadeClassifier();
-
+        labels = DetectObjects.loadLabels("C:\\Users\\keenan\\gitready\\smart-cctv-service\\src\\main\\labels\\mscoco_label_map.pbtxt");
+        testObjectDetect();
         carsClassifier.load(classifier);
         System.out.println(classifier);
 
