@@ -43,6 +43,8 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Tensor;
 import org.tensorflow.types.UInt8;
+import org.tensorflow.Graph;
+import org.tensorflow.Session;
 
 /**
  *
@@ -73,14 +75,15 @@ public class MainCCTVService {
     }
 
     private void testObjectDetect() throws IOException {
-        String modelPath = "src\\main\\models\\ssd_inception_v2_coco_2017_11_17\\frozen_inference_graph.pb";
-        try (SavedModelBundle model = SavedModelBundle.load(modelPath, "serve")) {
+        //String modelPath = "src\\main\\models\\ssd_mobilenet_v1_coco_2017_11_17\\frozen_inference_graph.pb";
+        String modelPath = "C:\\Users\\keenan\\gitready\\smart-cctv-service\\src\\main\\models\\ssd_mobilenet_v1_coco_2017_11_17";
+        Graph objectDetectionGraph = ObjectDetector.loadGraph("src\\main\\models\\ssd_mobilenet_v1_coco_2017_11_17\\frozen_inference_graph.pb");
+        try (Session sess = new Session(objectDetectionGraph)) { 
             final String filename = "src\\main\\java\\res\\images\\wisma_kosgoro.jpg";
             List<Tensor<?>> outputs = null;
             try (Tensor<UInt8> input = makeImageTensor(filename)) {
                 outputs
-                        = model
-                                .session()
+                        = sess
                                 .runner()
                                 .feed("image_tensor", input)
                                 .fetch("detection_scores")

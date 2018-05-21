@@ -61,41 +61,25 @@ public class ObjectDetector {
         return Tensor.create(UInt8.class, shape, ByteBuffer.wrap(data));
     }
 
+    public static Graph loadGraph(String path) throws IOException {
+        Graph objectDetectionGraph = new Graph();
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        BufferedOutputStream bos = new BufferedOutputStream(baos);
+        byte[] reader = new byte[1024];
+        int lengthRead = 0;
+        while ((lengthRead = bis.read(reader)) != -1) {
+            bos.write(Arrays.copyOfRange(reader, 0, lengthRead));
+        }
+        bos.flush();
+        objectDetectionGraph.importGraphDef(baos.toByteArray());
+        return objectDetectionGraph;
+    }
+
     public static void main(String[] args) {
         Graph objectDetectionGraph = new Graph();
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
         System.out.println("Current relative path is: " + s);
-
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("src\\main\\models\\ssd_mobilenet_v1_coco_2017_11_17\\frozen_inference_graph.pb"))) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BufferedOutputStream bos = new BufferedOutputStream(baos);
-            byte[] reader = new byte[1024];
-            int lengthRead = 0;
-            while ((lengthRead = bis.read(reader)) != -1) {
-                bos.write(Arrays.copyOfRange(reader, 0, lengthRead));
-            }
-            bos.flush();
-            //try (FileOutputStream fos = new FileOutputStream("test.pb")) {
-            //    fos.write(baos.toByteArray());
-            //}
-            objectDetectionGraph.importGraphDef(baos.toByteArray());
-            Iterator<Operation> opsIterator = objectDetectionGraph.operations();
-            while (opsIterator.hasNext()) {
-                Operation ops = opsIterator.next();
-                try {
-                    int length = ops.numOutputs();
-                    for (int i = 0; i < length; i++) {
-                        System.out.println(ops.output(i));
-                    }
-                } catch (IllegalArgumentException e) {
-
-                }
-            }
-
-        } catch (IOException ex) {
-            Logger.getLogger(ObjectDetector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
     }
 }
