@@ -38,6 +38,13 @@
             <artifactId>tensorflow</artifactId>
             <version>1.8.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.tensorflow/proto -->
+        <dependency>
+            <groupId>org.tensorflow</groupId>
+            <artifactId>proto</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+
     </dependencies>    
     
     <build>
@@ -76,6 +83,7 @@
                                 <excludes>
                                     <exclude>junit:junit</exclude>
                                     <exclude>org.tensorflow:tensorflow</exclude>  
+                                    <exclude>org.tensorflow:proto</exclude>  
                                     <exclude>org.tensorflow:libtensorflow</exclude>
                                     <exclude>org.tensorflow:libtensorflow_jni</exclude>                   
                                 </excludes>
