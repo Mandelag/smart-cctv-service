@@ -53,4 +53,6 @@ hs_err_pid*
 /dist/
 /build/
 /nbproject/private/
-/src/main/java/res
+/src/main/java/res/
+*.proto
+*.pbtxt
