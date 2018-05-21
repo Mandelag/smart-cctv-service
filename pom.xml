@@ -37,7 +37,6 @@
             <groupId>org.tensorflow</groupId>
             <artifactId>tensorflow</artifactId>
             <version>1.8.0</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>    
     
@@ -73,12 +72,18 @@
                                     <mainClass>com.mandelag.smartcctv.services.MaiNCCTVService  </mainClass>
                                 </transformer>
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>org.tensorflow:tensorflow</exclude>  
+                                    <exclude>org.tensorflow:libtensorflow</exclude>
+                                    <exclude>org.tensorflow:libtensorflow_jni</exclude>                   
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
-       
 </project>
